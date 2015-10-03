@@ -113,9 +113,15 @@ public struct DKImagePickerControllerSourceType : OptionSetType {
  */
 public class DKImagePickerController: UINavigationController {
     
+    /// Forces selction of tapped image immediatly
+    public var singleSelect = false
+    
     /// The maximum count of assets which the user will be able to select.
     public var maxSelectableCount = 999
     
+    // The types of ALAssetsGroups to display in the picker
+    public var assetGroupTypes: UInt32 = ALAssetsGroupAll
+
     /// The type of picker interface to be displayed by the controller.
     public var assetType = DKImagePickerControllerAssetType.allAssets
     
@@ -126,10 +132,10 @@ public class DKImagePickerController: UINavigationController {
     public var allowMultipleTypes = true
     
     /// The callback block is executed when user pressed the select button.
-    public var didSelectedAssets: ((assets: [DKAsset]) -> Void)?
+    public var didSelectAssets: ((assets: [DKAsset]) -> Void)?
     
     /// The callback block is executed when user pressed the cancel button.
-    public var didCancelled: (() -> Void)?
+    public var didCancel: (() -> Void)?
     
     /// It will have selected the specific assets.
     public var defaultSelectedAssets: [DKAsset]? {
@@ -195,18 +201,12 @@ public class DKImagePickerController: UINavigationController {
     
     internal func dismiss() {
         self.dismissViewControllerAnimated(true, completion: nil)
-        
-        if let didCancelled = self.didCancelled {
-            didCancelled()
-        }
+        self.didCancel?()
     }
     
     internal func done() {
         self.dismissViewControllerAnimated(true, completion: nil)
-        
-        if let didSelectedAssets = self.didSelectedAssets {
-            didSelectedAssets(assets: self.selectedAssets)
-        }
+        self.didSelectAssets?(assets: self.selectedAssets)
     }
     
     // MARK: - Notifications
@@ -215,6 +215,8 @@ public class DKImagePickerController: UINavigationController {
         if let asset = noti.object as? DKAsset {
             selectedAssets.append(asset)
             if asset.isFromCamera {
+                self.done()
+            } else if self.singleSelect {
                 self.done()
             } else {
                 updateDoneButtonTitle()

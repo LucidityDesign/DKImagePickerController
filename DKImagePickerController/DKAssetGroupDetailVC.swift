@@ -339,7 +339,7 @@ internal class DKAssetGroupDetailVC: UICollectionViewController {
                     return
             }
             
-            self.library.enumerateGroupsWithTypes(ALAssetsGroupAll, usingBlock: {(group: ALAssetsGroup! , stop: UnsafeMutablePointer<ObjCBool>) in
+            self.library.enumerateGroupsWithTypes(self.imagePickerController!.assetGroupTypes, usingBlock: {(group: ALAssetsGroup! , stop: UnsafeMutablePointer<ObjCBool>) in
                 if group != nil {
                     group.setAssetsFilter(self.imagePickerController!.assetType.toALAssetsFilter())
                     
@@ -409,7 +409,7 @@ internal class DKAssetGroupDetailVC: UICollectionViewController {
     
     func createCamera() -> DKCamera {
         let camera = DKCamera()
-        camera.didCancelled = {[unowned camera] () -> Void in
+        camera.didCancel = {[unowned camera] () -> Void in
             camera.dismissViewControllerAnimated(true, completion: nil)
         }
         
@@ -508,8 +508,10 @@ internal class DKAssetGroupDetailVC: UICollectionViewController {
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         NSNotificationCenter.defaultCenter().postNotificationName(DKImageSelectedNotification, object: imageAssets[assetIndexForIndexPath(indexPath)])
         
-        let cell = collectionView.cellForItemAtIndexPath(indexPath) as! DKAssetCell
-        cell.checkView.checkLabel.text = "\(self.imagePickerController!.selectedAssets.count)"
+        if !self.imagePickerController!.singleSelect {
+            let cell = collectionView.cellForItemAtIndexPath(indexPath) as! DKAssetCell
+            cell.checkView.checkLabel.text = "\(self.imagePickerController!.selectedAssets.count)"
+        }
     }
     
     override func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
