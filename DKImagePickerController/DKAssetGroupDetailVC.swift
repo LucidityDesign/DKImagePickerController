@@ -297,12 +297,12 @@ internal class DKAssetGroupDetailVC: UICollectionViewController {
     convenience init() {
         let layout = UICollectionViewFlowLayout()
         
-        let interval: CGFloat = 3
+        let interval: CGFloat = 1.5
         layout.minimumInteritemSpacing = interval
         layout.minimumLineSpacing = interval
         
         let screenWidth = min(UIScreen.mainScreen().bounds.width, UIScreen.mainScreen().bounds.height)
-        let itemWidth = (screenWidth - interval * 3) / 3
+        let itemWidth = (screenWidth - interval * 4) / 4
         
         layout.itemSize = CGSize(width: itemWidth, height: itemWidth)
         
